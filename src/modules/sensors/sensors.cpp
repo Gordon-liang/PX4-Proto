@@ -462,7 +462,14 @@ void Sensors::InitializeVehicleIMU()
 				const bool multi_mode = (_param_sens_imu_mode.get() == 0);
 				const px4::wq_config_t &wq_config = multi_mode ? px4::ins_instance_to_wq(i) : px4::wq_configurations::INS0;
 
-				VehicleIMU *imu = new VehicleIMU(i, i, i, wq_config);
+				const int32_t location = calibration::GetCalibrationParamInt32("ACC",  "LOC", i);
+
+				if ((location < 0) || (location > 1)) {
+					// Unsupported
+					continue;
+				}
+
+				VehicleIMU *imu = new VehicleIMU(i, i, i, wq_config, location);
 
 				if (imu != nullptr) {
 					// Start VehicleIMU instance and store
