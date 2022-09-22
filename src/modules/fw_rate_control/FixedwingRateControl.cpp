@@ -156,18 +156,6 @@ FixedwingRateControl::vehicle_attitude_setpoint_poll()
 }
 
 void
-FixedwingRateControl::vehicle_rates_setpoint_poll()
-{
-	if (_rates_sp_sub.update(&_rates_sp)) {
-		if (_vehicle_status.is_vtol_tailsitter) {
-			float tmp = _rates_sp.roll;
-			_rates_sp.roll = -_rates_sp.yaw;
-			_rates_sp.yaw = tmp;
-		}
-	}
-}
-
-void
 FixedwingRateControl::vehicle_land_detected_poll()
 {
 	if (_vehicle_land_detected_sub.updated()) {
@@ -417,7 +405,7 @@ void FixedwingRateControl::Run()
 			trim_pitch += _spoiler_setpoint_with_slewrate.getState() * _param_fw_dtrim_p_spoil.get();
 
 			if (_vcontrol_mode.flag_control_rates_enabled) {
-				vehicle_rates_setpoint_poll();
+				_rates_sp_sub.update(&_rates_sp);
 
 				const Vector3f body_rates_setpoint = Vector3f(_rates_sp.roll, _rates_sp.pitch, _rates_sp.yaw);
 
